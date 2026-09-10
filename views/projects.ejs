@@ -1,4 +1,16 @@
 <%- include('partials/header') %>
 <h1><%= title %></h1>
 <p>View our upcoming service projects.</p>
+
+<ul>
+    <% projects.forEach(project => { %>
+        <li>
+            <strong><%= project.title %></strong> — <em><%= project.organization_name %></em><br>
+            <%= project.description %><br>
+            Location: <%= project.location %> | Date: <%= project.project_date.toISOString().split('T')[0] %>
+        </li>
+        <br>
+    <% }) %>
+</ul>
+
 <%- include('partials/footer') %>

@@ -2,22 +2,13 @@
 <h1><%= title %></h1>
 <p>Here are our partner organizations.</p>
 
-<div class="organization">
-    <h2>Green Earth Initiative</h2>
-    <img src="/images/env-org.jpg" alt="Hands holding a small plant">
-    <p>Dedicated to planting trees and protecting our local environment.</p>
-</div>
-
-<div class="organization">
-    <h2>Open Books Education</h2>
-    <img src="/images/edu-org.jpg" alt="A stack of vintage books">
-    <p>Providing free tutoring and reading materials to students in need.</p>
-</div>
-
-<div class="organization">
-    <h2>Community Builders</h2>
-    <img src="/images/community-org.jpg" alt="Inside a community center">
-    <p>Creating safe spaces and resources for neighborhood events.</p>
-</div>
+<% organizations.forEach(org => { %>
+    <div class="organization">
+        <h2><%= org.name %></h2>
+        <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
+        <p><%= org.description %></p>
+        <p><small>Contact: <%= org.contact_email %></small></p>
+    </div>
+<% }) %>
 
 <%- include('partials/footer') %>

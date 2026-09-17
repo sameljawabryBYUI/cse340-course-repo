@@ -3,9 +3,9 @@
 <p>Here are our partner organizations.</p>
 
 <% organizations.forEach(org => { %>
-    <div class="organization">
-        <h2><%= org.name %></h2>
-        <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
+    <div class="organization" style="margin-bottom: 30px;">
+        <h2><a href="/organization/<%= org.organization_id %>"><%= org.name %></a></h2>
+        <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo" style="max-width: 400px; border-radius: 8px;">
         <p><%= org.description %></p>
         <p><small>Contact: <%= org.contact_email %></small></p>
     </div>

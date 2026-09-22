@@ -30,4 +30,36 @@ const getCategoriesByProjectId = async (projectId) => {
     return result.rows;
 };
 
-export { getAllCategories, getCategoryDetails, getCategoriesByProjectId };
+const createCategory = async (categoryName) => {
+    const query = `
+        INSERT INTO public.category (category_name)
+        VALUES ($1)
+        RETURNING category_id;
+    `;
+    const result = await db.query(query, [categoryName]);
+    return result.rows[0].category_id;
+};
+
+const updateCategory = async (categoryId, categoryName) => {
+    const query = `
+        UPDATE public.category
+        SET category_name = $1
+        WHERE category_id = $2
+        RETURNING category_id;
+    `;
+    const result = await db.query(query, [categoryName, categoryId]);
+    
+    if (result.rows.length === 0) {
+        throw new Error('Category not found or update failed');
+    }
+    
+    return result.rows[0].category_id;
+};
+
+export { 
+    getAllCategories, 
+    getCategoryDetails, 
+    getCategoriesByProjectId,
+    createCategory,
+    updateCategory
+};

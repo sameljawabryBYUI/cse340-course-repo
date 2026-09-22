@@ -57,10 +57,47 @@ const getProjectsByCategoryId = async (categoryId) => {
     return result.rows;
 };
 
+const updateProject = async (projectId, title, description, location, projectDate, organizationId) => {
+    const query = `
+        UPDATE public.project
+        SET title = $1, description = $2, location = $3, project_date = $4, organization_id = $5
+        WHERE project_id = $6
+        RETURNING project_id;
+    `;
+    
+    const queryParams = [title, description, location, projectDate, organizationId, projectId];
+    const result = await db.query(query, queryParams);
+    
+    if (result.rows.length === 0) {
+        throw new Error('Project not found or update failed');
+    }
+    
+    return result.rows[0].project_id;
+};
+
+// NEW FUNCTION: Updates the category assignments for a project
+const updateProjectCategories = async (projectId, categoryIds) => {
+    // 1. Remove all existing category associations for this project
+    await db.query('DELETE FROM public.project_category WHERE project_id = $1', [projectId]);
+    
+    // 2. If the user unchecked all boxes, categoryIds will be undefined. Stop here.
+    if (!categoryIds) return;
+
+    // 3. Ensure categoryIds is an array (Express sends a string if only 1 box is checked)
+    const ids = Array.isArray(categoryIds) ? categoryIds : [categoryIds];
+
+    // 4. Insert the new checked categories into the database
+    for (const catId of ids) {
+        await db.query('INSERT INTO public.project_category (project_id, category_id) VALUES ($1, $2)', [projectId, catId]);
+    }
+};
+
 export { 
     getAllProjects, 
     getProjectsByOrganizationId, 
     getUpcomingProjects, 
     getProjectDetails, 
-    getProjectsByCategoryId 
+    getProjectsByCategoryId,
+    updateProject,
+    updateProjectCategories
 };

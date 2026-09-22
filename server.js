@@ -5,12 +5,31 @@ import { fileURLToPath } from 'url';
 import { testConnection } from './src/models/db.js';
 import router from './src/routes.js';
 
+// 1. Import session and flash
+import session from 'express-session';
+import flash from './src/middleware/flash.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
+
+// Allow Express to receive and process common form data (POST requests)
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// 2. Set up Session management
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'my_super_secret_key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 } // Session expires after 1 hour
+}));
+
+// 3. Use flash message middleware
+app.use(flash);
 
 // Static Middleware
 app.use(express.static(path.join(__dirname, 'public')));

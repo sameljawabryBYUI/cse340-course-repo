@@ -37,6 +37,11 @@ const createCategory = async (categoryName) => {
         RETURNING category_id;
     `;
     const result = await db.query(query, [categoryName]);
+    
+    if (result.rows.length === 0) {
+        throw new Error('Failed to create category');
+    }
+    
     return result.rows[0].category_id;
 };
 

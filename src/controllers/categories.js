@@ -5,7 +5,17 @@ import {
     updateCategory 
 } from '../models/categories.js';
 import { getProjectsByCategoryId } from '../models/projects.js';
-import { validationResult } from 'express-validator';
+import { body, validationResult } from 'express-validator'; // Imported 'body' here now!
+
+// ----------------------------------------------------
+// NEW: Reusable Validation Logic defined in the Controller (Criteria 4 & 5)
+// ----------------------------------------------------
+const validateCategoryRules = [
+    body('category_name')
+        .trim()
+        .notEmpty().withMessage('Category name is required.')
+        .isLength({ min: 3, max: 100 }).withMessage('Category name must be between 3 and 100 characters.')
+];
 
 const showCategoriesPage = async (req, res) => {
     const categories = await getAllCategories();
@@ -34,7 +44,6 @@ const processAddCategoryForm = async (req, res) => {
         errors.array().forEach((error) => {
             req.flash('error', error.msg);
         });
-        // Render instead of redirect, passing the typed name back so the form is "sticky"
         const title = 'Add New Category';
         return res.render('add-category', { title, category_name });
     }
@@ -61,7 +70,6 @@ const processEditCategoryForm = async (req, res) => {
         errors.array().forEach((error) => {
             req.flash('error', error.msg);
         });
-        // Reconstruct categoryDetails so the form doesn't break and remains "sticky"
         const categoryDetails = { category_id: categoryId, category_name };
         const title = 'Edit Category';
         return res.render('edit-category', { title, categoryDetails });
@@ -72,11 +80,13 @@ const processEditCategoryForm = async (req, res) => {
     res.redirect(`/category/${categoryId}`);
 };
 
+// Export the validation rules alongside the other functions
 export { 
     showCategoriesPage, 
     showCategoryDetailsPage,
     showAddCategoryForm,
     processAddCategoryForm,
     showEditCategoryForm,
-    processEditCategoryForm
+    processEditCategoryForm,
+    validateCategoryRules
 };

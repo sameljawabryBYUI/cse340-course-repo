@@ -4,6 +4,8 @@
 
 <div class="organization-details">
     <h2><%= organizationDetails.name %></h2>
+    <p><a href="/edit-organization/<%= organizationDetails.organization_id %>"><strong>Edit Organization</strong></a></p>
+    
     <img src="/images/<%= organizationDetails.logo_filename %>" alt="<%= organizationDetails.name %> logo" style="max-width: 400px; border-radius: 8px; margin-bottom: 15px;">
     <p><strong>Description:</strong> <%= organizationDetails.description %></p>
     <p><small>Contact: <%= organizationDetails.contact_email %></small></p>

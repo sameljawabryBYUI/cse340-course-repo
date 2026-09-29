@@ -1,31 +1,101 @@
 import bcrypt from 'bcrypt';
-import { createUser } from '../models/users.js';
+import { createUser, authenticateUser } from '../models/users.js';
 
-// Renders the registration form view
+// ==========================================
+// REGISTRATION CONTROLLERS
+// ==========================================
+
 export const showUserRegistrationForm = (req, res) => {
     res.render('register', { title: 'Register' });
 };
 
-// Handles registration logic, hashing, and saving the user
 export const processUserRegistrationForm = async (req, res) => {
+    const { name, email, password } = req.body;
+
     try {
-        const { name, email, password } = req.body;
-        
-        const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(password, saltRounds);
-        
-        await createUser(name, email, passwordHash);
-        
+        // Hash the password before storing it
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+
+        // Create the user in the database
+        const userId = await createUser(name, email, passwordHash);
+
+        // Redirect to the home page after successful registration
+        req.flash('success', 'Registration successful! Please log in.');
         res.redirect('/');
-        
     } catch (error) {
-        console.error("Error during registration:", error);
+        console.error('Error registering user:', error);
         
-        // Check if the error is a PostgreSQL unique violation (duplicate email)
         if (error.code === '23505') {
-            return res.status(400).send("An account with this email already exists. Please use a different email.");
+            req.flash('error', 'An account with this email already exists.');
+        } else {
+            req.flash('error', 'An error occurred during registration. Please try again.');
         }
-        
-        res.status(500).send("An error occurred during registration.");
+        res.redirect('/register');
     }
+};
+
+// ==========================================
+// LOGIN & LOGOUT CONTROLLERS
+// ==========================================
+
+export const showLoginForm = (req, res) => {
+    res.render('login', { title: 'Login' });
+};
+
+export const processLoginForm = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await authenticateUser(email, password);
+        if (user) {
+            // Store user info in session
+            req.session.user = user;
+            req.flash('success', 'Login successful!');
+
+            if (res.locals.NODE_ENV === 'development') {
+                console.log('User logged in:', user);
+            }
+
+            // Redirect to dashboard instead of root
+            res.redirect('/dashboard');
+        } else {
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        req.flash('error', 'An error occurred during login. Please try again.');
+        res.redirect('/login');
+    }
+};
+
+export const processLogout = async (req, res) => {
+    if (req.session.user) {
+        delete req.session.user;
+    }
+
+    req.flash('success', 'Logout successful!');
+    res.redirect('/login');
+};
+
+// ==========================================
+// PROTECTED ROUTES & MIDDLEWARE
+// ==========================================
+
+export const requireLogin = (req, res, next) => {
+    if (!req.session || !req.session.user) {
+        req.flash('error', 'You must be logged in to access that page.');
+        return res.redirect('/login');
+    }
+    next();
+};
+
+export const showDashboard = (req, res) => {
+    const user = req.session.user;
+    res.render('dashboard', { 
+        title: 'Dashboard',
+        name: user.name,
+        email: user.email
+    });
 };

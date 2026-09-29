@@ -29,10 +29,14 @@ import {
     processEditCategoryForm,
     validateCategoryRules
 } from './controllers/categories.js';
-// Import your new user controller functions here
 import { 
     showUserRegistrationForm, 
-    processUserRegistrationForm 
+    processUserRegistrationForm,
+    showLoginForm,
+    processLoginForm,
+    processLogout,
+    requireLogin,
+    showDashboard
 } from './controllers/users.js';
 import { testErrorPage } from './controllers/errors.js';
 
@@ -91,10 +95,17 @@ router.post('/edit-category/:id', validateCategoryRules, processEditCategoryForm
 
 
 // ==========================================
-// REGISTRATION ROUTES
+// REGISTRATION, AUTHENTICATION & DASHBOARD
 // ==========================================
 router.get('/register', showUserRegistrationForm);
 router.post('/register', processUserRegistrationForm);
+
+router.get('/login', showLoginForm);
+router.post('/login', processLoginForm);
+router.get('/logout', processLogout);
+
+// Protected dashboard route
+router.get('/dashboard', requireLogin, showDashboard);
 
 
 // Error testing route

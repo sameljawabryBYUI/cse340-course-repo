@@ -5,4 +5,8 @@
 <!-- Added home page image -->
 <img src="/images/home.jpg" alt="Volunteers packing food">
 
+<% if (isLoggedIn) { %>
+    <p><a href="/dashboard">My Dashboard</a></p>
+<% } %>
+
 <%- include('partials/footer') %>

@@ -29,6 +29,11 @@ import {
     processEditCategoryForm,
     validateCategoryRules
 } from './controllers/categories.js';
+// Import your new user controller functions here
+import { 
+    showUserRegistrationForm, 
+    processUserRegistrationForm 
+} from './controllers/users.js';
 import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
@@ -83,6 +88,13 @@ router.post('/new-category', validateCategoryRules, processAddCategoryForm);
 // Edit Category
 router.get('/edit-category/:id', showEditCategoryForm);
 router.post('/edit-category/:id', validateCategoryRules, processEditCategoryForm); 
+
+
+// ==========================================
+// REGISTRATION ROUTES
+// ==========================================
+router.get('/register', showUserRegistrationForm);
+router.post('/register', processUserRegistrationForm);
 
 
 // Error testing route

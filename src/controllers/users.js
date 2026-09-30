@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { createUser, authenticateUser } from '../models/users.js';
+import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
 
 // ==========================================
 // REGISTRATION CONTROLLERS
@@ -118,10 +118,27 @@ export const requireRole = (role) => {
         // Check if user's role matches the required role
         if (req.session.user.role_name !== role) {
             req.flash('error', 'You do not have permission to access this page.');
-            return res.redirect('/');
+            return res.redirect('/dashboard');
         }
 
         // User has required role, continue
         next();
     };
+};
+
+// ==========================================
+// ADMIN CONTROLLERS
+// ==========================================
+
+export const showUsersPage = async (req, res, next) => {
+    try {
+        const usersList = await getAllUsers();
+        res.render('users', { 
+            title: 'Registered Users',
+            usersList 
+        });
+    } catch (error) {
+        console.error('Error fetching users for admin page:', error);
+        next(error);
+    }
 };

@@ -2,7 +2,9 @@
 <h1><%= title %></h1>
 <p>Here are our partner organizations.</p>
 
-<p><a href="/new-organization"><strong>+ Add New Organization</strong></a></p>
+<% if (user && user.role_name === 'admin') { %>
+    <p><a href="/new-organization"><strong>+ Add New Organization</strong></a></p>
+<% } %>
 
 <% organizations.forEach(org => { %>
     <div class="organization" style="margin-bottom: 30px;">

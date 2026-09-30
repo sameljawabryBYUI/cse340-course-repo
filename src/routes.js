@@ -36,7 +36,8 @@ import {
     processLoginForm,
     processLogout,
     requireLogin,
-    showDashboard
+    showDashboard,
+    requireRole
 } from './controllers/users.js';
 import { testErrorPage } from './controllers/errors.js';
 
@@ -52,12 +53,12 @@ router.get('/organizations', showOrganizationsPage);
 router.get('/organization/:id', showOrganizationDetailsPage);
 
 // Create Organization
-router.get('/new-organization', showAddOrganizationForm);
-router.post('/new-organization', validateOrganizationRules, processAddOrganizationForm);
+router.get('/new-organization', requireRole('admin'), showAddOrganizationForm);
+router.post('/new-organization', requireRole('admin'), validateOrganizationRules, processAddOrganizationForm);
 
 // Edit Organization
-router.get('/edit-organization/:id', showEditOrganizationForm);
-router.post('/edit-organization/:id', validateOrganizationRules, processEditOrganizationForm);
+router.get('/edit-organization/:id', requireRole('admin'), showEditOrganizationForm);
+router.post('/edit-organization/:id', requireRole('admin'), validateOrganizationRules, processEditOrganizationForm);
 
 
 // ==========================================
@@ -67,16 +68,16 @@ router.get('/projects', showProjectsPage);
 router.get('/project/:id', showProjectDetailsPage);
 
 // Create Project
-router.get('/new-project', showAddProjectForm);
-router.post('/new-project', validateProjectRules, processAddProjectForm);
+router.get('/new-project', requireRole('admin'), showAddProjectForm);
+router.post('/new-project', requireRole('admin'), validateProjectRules, processAddProjectForm);
 
 // Edit Project
-router.get('/edit-project/:id', showEditProjectForm);
-router.post('/edit-project/:id', validateProjectRules, processEditProjectForm);
+router.get('/edit-project/:id', requireRole('admin'), showEditProjectForm);
+router.post('/edit-project/:id', requireRole('admin'), validateProjectRules, processEditProjectForm);
 
 // Assign Categories to Project
-router.get('/project/:id/assign-categories', showAssignCategoriesForm);
-router.post('/project/:id/assign-categories', processAssignCategoriesForm);
+router.get('/project/:id/assign-categories', requireRole('admin'), showAssignCategoriesForm);
+router.post('/project/:id/assign-categories', requireRole('admin'), processAssignCategoriesForm);
 
 
 // ==========================================
@@ -86,12 +87,12 @@ router.get('/categories', showCategoriesPage);
 router.get('/category/:id', showCategoryDetailsPage);
 
 // Create Category
-router.get('/new-category', showAddCategoryForm);
-router.post('/new-category', validateCategoryRules, processAddCategoryForm); 
+router.get('/new-category', requireRole('admin'), showAddCategoryForm);
+router.post('/new-category', requireRole('admin'), validateCategoryRules, processAddCategoryForm); 
 
 // Edit Category
-router.get('/edit-category/:id', showEditCategoryForm);
-router.post('/edit-category/:id', validateCategoryRules, processEditCategoryForm); 
+router.get('/edit-category/:id', requireRole('admin'), showEditCategoryForm);
+router.post('/edit-category/:id', requireRole('admin'), validateCategoryRules, processEditCategoryForm); 
 
 
 // ==========================================

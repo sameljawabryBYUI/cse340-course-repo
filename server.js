@@ -52,6 +52,10 @@ app.use((req, res, next) => {
     if (req.session && req.session.user) {
         res.locals.isLoggedIn = true;
     }
+    
+    // Make user data (including role_name) available to all templates
+    res.locals.user = req.session.user || null;
+    
     res.locals.NODE_ENV = NODE_ENV;
     next();
 });

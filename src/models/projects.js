@@ -57,7 +57,6 @@ const getProjectsByCategoryId = async (categoryId) => {
     return result.rows;
 };
 
-// --- NEW FUNCTION: Create a project ---
 const createProject = async (title, description, location, projectDate, organizationId) => {
     const query = `
         INSERT INTO public.project (title, description, location, project_date, organization_id)
@@ -95,13 +94,58 @@ const updateProjectCategories = async (projectId, categoryIds) => {
     }
 };
 
+// --- NEW FUNCTIONS FOR VOLUNTEERING (W06 Feature) ---
+
+const addVolunteerToProject = async (userId, projectId) => {
+    const query = `
+        INSERT INTO public.project_volunteer (user_id, project_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING;
+    `;
+    await db.query(query, [userId, projectId]);
+};
+
+const removeVolunteerFromProject = async (userId, projectId) => {
+    const query = `
+        DELETE FROM public.project_volunteer
+        WHERE user_id = $1 AND project_id = $2;
+    `;
+    await db.query(query, [userId, projectId]);
+};
+
+const checkIfUserIsVolunteering = async (userId, projectId) => {
+    const query = `
+        SELECT 1 FROM public.project_volunteer
+        WHERE user_id = $1 AND project_id = $2;
+    `;
+    const result = await db.query(query, [userId, projectId]);
+    return result.rows.length > 0;
+};
+
+const getVolunteeredProjectsForUser = async (userId) => {
+    const query = `
+        SELECT p.project_id, p.title, p.description, p.location, p.project_date, p.organization_id, o.name AS organization_name
+        FROM public.project p
+        JOIN public.project_volunteer pv ON p.project_id = pv.project_id
+        JOIN public.organization o ON p.organization_id = o.organization_id
+        WHERE pv.user_id = $1
+        ORDER BY p.project_date ASC;
+    `;
+    const result = await db.query(query, [userId]);
+    return result.rows;
+};
+
 export { 
     getAllProjects, 
     getProjectsByOrganizationId, 
     getUpcomingProjects, 
     getProjectDetails, 
     getProjectsByCategoryId,
-    createProject, // <-- Exported here
+    createProject,
     updateProject,
-    updateProjectCategories
+    updateProjectCategories,
+    addVolunteerToProject,
+    removeVolunteerFromProject,
+    checkIfUserIsVolunteering,
+    getVolunteeredProjectsForUser
 };

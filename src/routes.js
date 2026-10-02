@@ -18,7 +18,9 @@ import {
     processEditProjectForm,
     showAssignCategoriesForm,
     processAssignCategoriesForm,
-    validateProjectRules
+    validateProjectRules,
+    volunteerForProject,       // NEW
+    unvolunteerForProject      // NEW
 } from './controllers/projects.js';
 import { 
     showCategoriesPage, 
@@ -67,6 +69,10 @@ router.post('/edit-organization/:id', requireRole('admin'), validateOrganization
 // ==========================================
 router.get('/projects', showProjectsPage);
 router.get('/project/:id', showProjectDetailsPage);
+
+// Volunteering Routes (W06 Feature)
+router.get('/project/:id/volunteer', requireLogin, volunteerForProject);
+router.get('/project/:id/unvolunteer', requireLogin, unvolunteerForProject);
 
 // Create Project
 router.get('/new-project', requireRole('admin'), showAddProjectForm);

@@ -7,6 +7,25 @@
     <p>Name: <%= name %></p>
     <p>Username: <%= email %></p>
 
+    <!-- NEW: Volunteered Projects Section -->
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+    <h3>My Volunteered Projects</h3>
+    
+    <% if (volunteeredProjects && volunteeredProjects.length > 0) { %>
+        <ul>
+            <% volunteeredProjects.forEach(project => { %>
+                <li style="margin-bottom: 15px;">
+                    <strong><a href="/project/<%= project.project_id %>"><%= project.title %></a></strong> — 
+                    <em><a href="/organization/<%= project.organization_id %>"><%= project.organization_name %></a></em><br>
+                    Location: <%= project.location %> | Date: <%= new Date(project.project_date).toLocaleDateString() %><br>
+                    <a href="/project/<%= project.project_id %>/unvolunteer" style="color: #dc3545; font-size: 0.9em; font-weight: bold;">Remove me as a volunteer</a>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>You have not volunteered for any projects yet. <a href="/projects">Find a project!</a></p>
+    <% } %>
+
     <% if (user && user.role_name === 'admin') { %>
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
         <h3>Admin Controls</h3>

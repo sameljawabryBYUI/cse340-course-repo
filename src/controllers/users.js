@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
+import { getVolunteeredProjectsForUser } from '../models/projects.js'; // NEW IMPORT
 
 // ==========================================
 // REGISTRATION CONTROLLERS
@@ -91,12 +92,16 @@ export const requireLogin = (req, res, next) => {
     next();
 };
 
-export const showDashboard = (req, res) => {
+// NEW: Updated to be async and fetch volunteered projects
+export const showDashboard = async (req, res) => {
     const user = req.session.user;
+    const volunteeredProjects = await getVolunteeredProjectsForUser(user.user_id);
+    
     res.render('dashboard', { 
         title: 'Dashboard',
         name: user.name,
-        email: user.email
+        email: user.email,
+        volunteeredProjects
     });
 };
 

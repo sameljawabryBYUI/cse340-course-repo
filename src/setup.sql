@@ -1,8 +1,11 @@
 -- Drop tables in reverse order of dependencies to prevent errors if re-running
+DROP TABLE IF EXISTS project_volunteer CASCADE;
 DROP TABLE IF EXISTS project_category CASCADE;
 DROP TABLE IF EXISTS project CASCADE;
 DROP TABLE IF EXISTS category CASCADE;
 DROP TABLE IF EXISTS organization CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
 
 -- 1. Create Organization Table
 CREATE TABLE organization (
@@ -13,7 +16,7 @@ CREATE TABLE organization (
     logo_filename VARCHAR(255) NOT NULL
 );
 
--- 2. Create Project Table (Team Activity Requirement)
+-- 2. Create Project Table
 CREATE TABLE project (
     project_id SERIAL PRIMARY KEY,
     organization_id INTEGER NOT NULL REFERENCES organization(organization_id),
@@ -23,13 +26,13 @@ CREATE TABLE project (
     project_date DATE NOT NULL
 );
 
--- 3. Create Category Table (W02 Assignment Requirement)
+-- 3. Create Category Table
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(100) NOT NULL
 );
 
--- 4. Create Junction Table to link Projects and Categories (Many-to-Many)
+-- 4. Create Junction Table to link Projects and Categories
 CREATE TABLE project_category (
     project_id INTEGER NOT NULL REFERENCES project(project_id) ON DELETE CASCADE,
     category_id INTEGER NOT NULL REFERENCES category(category_id) ON DELETE CASCADE,
@@ -42,7 +45,7 @@ INSERT INTO organization (name, description, contact_email, logo_filename) VALUE
 ('GreenHarvest Growers', 'An urban farming collective promoting food sustainability and education in local neighborhoods.', 'contact@greenharvest.org', 'edu-org.jpg'),
 ('UnityServe Volunteers', 'A volunteer coordination group supporting local charities and service initiatives.', 'hello@unityserve.org', 'community-org.jpg');
 
--- 6. Insert 15 Projects (Strictly 5 per organization as required by the Team Activity)
+-- 6. Insert 15 Projects
 INSERT INTO project (organization_id, title, description, location, project_date) VALUES
 (1, 'Playground Build', 'Building a new community playground.', 'City Park', '2026-10-15'),
 (1, 'School Repair', 'Fixing the roof at the local elementary school.', 'Local School', '2026-10-22'),
@@ -60,7 +63,7 @@ INSERT INTO project (organization_id, title, description, location, project_date
 (3, 'Winter Coat Drive', 'Collecting and distributing coats.', 'City Hall', '2026-11-11'),
 (3, 'Holiday Meal Delivery', 'Delivering hot meals to those in need.', 'Downtown', '2026-11-26');
 
--- 7. Insert Categories (W02 Assignment Requirement)
+-- 7. Insert Categories
 INSERT INTO category (category_name) VALUES
 ('Environmental'),
 ('Educational'),
@@ -73,16 +76,19 @@ INSERT INTO project_category (project_id, category_id) VALUES
 (6, 1), (7, 1), (8, 1), (8, 2), (9, 1), (10, 1),
 (11, 3), (12, 4), (13, 2), (14, 3), (15, 4), (15, 3);
 
+-- 9. Create Roles Table
 CREATE TABLE roles (
     role_id SERIAL PRIMARY KEY,
     role_name VARCHAR(50) UNIQUE NOT NULL,
     role_description TEXT
 );
 
+-- 10. Insert Roles
 INSERT INTO roles (role_name, role_description) VALUES
 ('user', 'Standard user with basic access'),
 ('admin', 'Administrator with full system access');
 
+-- 11. Create Users Table
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -90,4 +96,11 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     role_id INTEGER REFERENCES roles (role_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 12. Create Volunteer Table (W06 Feature)
+CREATE TABLE project_volunteer (
+    user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    project_id INTEGER NOT NULL REFERENCES project(project_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, project_id)
 );
